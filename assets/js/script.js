@@ -1,12 +1,13 @@
 const failedError = document.querySelector(".failed-error")
-const loadButton = document.querySelector("#loadButton")
+const searchForm = document.querySelector("#searchForm")
 const information = document.querySelector(".information")
 const neighbors = document.querySelector(".neighbors")
 const cardInformation = document.querySelector(".card-information")
 const inputText = document.querySelector(".inputText")
 
-loadButton.addEventListener("click",function(){
-    country(inputText.value);
+searchForm.addEventListener("submit", function (event) {
+    event.preventDefault()
+    country(inputText.value)
 })
 
 function country(country) {
@@ -34,7 +35,7 @@ function filterCountry(data) {
     cardInformation.innerHTML = "";
     neighbors.innerHTML = "";
 
-    let html = `                   
+    let html = `
             <div class="col-5">
                 <img src="${data.flags.png}" >
             </div>
@@ -57,7 +58,7 @@ function filterCountry(data) {
                     <div class="col-5"> Currency : </div>
                     <div class="col-7">${Object.values(data.currencies)[0].name}</div>
                 </div>
-                
+
             </div>
     `;
     information.style.display = "block";
@@ -97,5 +98,3 @@ function error(err) {
     }, 5000);
     failedError.innerHTML = html;
 }
-
-
