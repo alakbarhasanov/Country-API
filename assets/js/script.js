@@ -7,10 +7,10 @@ const inputText = document.querySelector(".inputText")
 
 searchForm.addEventListener("submit", function (event) {
     event.preventDefault()
-    country(inputText.value)
+    fetchCountryByName(inputText.value)
 })
 
-function country(country) {
+function fetchCountryByName(country) {
     fetch('https://restcountries.com/v3.1/name/' + country)
         .then((response) => {
             if (!response.ok)
@@ -18,24 +18,23 @@ function country(country) {
             return response.json();
         })
         .then((data) => {
-            filterCountry(data[0]);
+            renderCountry(data[0]);
             const countries = data[0].borders;
             if (!countries)
-                throw new Error("Neighbors country not found")
+                throw new Error("Neighbor countries not found")
             return fetch('https://restcountries.com/v3.1/alpha?codes=' + countries.toString());
         })
         .then(response => response.json())
-        .then((data) => neighbor(data))
-        .catch(err => error(err))
+        .then(neighborList => renderNeighbors(neighborList))
+        .catch(error => renderError(error))
 }
 
 
-
-function filterCountry(data) {
+function renderCountry(data) {
     cardInformation.innerHTML = "";
     neighbors.innerHTML = "";
 
-    let html = `
+    const html = `
             <div class="col-5">
                 <img src="${data.flags.png}" >
             </div>
@@ -58,7 +57,6 @@ function filterCountry(data) {
                     <div class="col-5"> Currency : </div>
                     <div class="col-7">${Object.values(data.currencies)[0].name}</div>
                 </div>
-
             </div>
     `;
     information.style.display = "block";
@@ -66,9 +64,9 @@ function filterCountry(data) {
 }
 
 
-function neighbor(data) {
+function renderNeighbors(neighborList) {
     let html = "";
-    for (let country of data) {
+    for (const country of neighborList) {
         html += `
             <div class="col-2" style="margin-top:20px">
                 <div class="card" style="height:200px">
@@ -79,22 +77,21 @@ function neighbor(data) {
                 </div>
             </div>
         `;
-
     }
     neighbors.innerHTML = html;
 }
 
 
-function error(err) {
-    let html = ''
-    html = `
+function renderError(error) {
+    const html = `
         <div class="alert alert-danger">
-        ${err.message}
+          ${error.message}
         </div>
     `;
 
     setTimeout(() => {
         failedError.innerHTML = "";
     }, 5000);
+
     failedError.innerHTML = html;
 }
